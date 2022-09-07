@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=0.5,maximum-scale=0.5,minimum-scale=0.5,viewport-fit=cover">
+<script src="./js/viewport.js"></script>
+<style type="text/css">
+	html{width:100%;height:100%;}
+	body{width:100%;height:100%;margin:0px;}
+	.jump{width:100%;height:100%;border:0px;}
+</style>
+</head>
+<body>
+</body>
+<script type="text/javascript" src="js/web3.min.js"></script>
+<script type="text/javascript" src="js/web3Utils.js?v=1.0.0"></script>
+<script type="text/javascript">
+	var App = {
+		web3: null,
+		client: null,
+		send: (msg)=>{
+			App.client.contentWindow.postMessage(msg,'*');
+		},
+
+		rpcNotify: (event, result) => {
+			App.send({module:"coin-rpc-notify", event:event, result: result});
+		},
+
+		rpcMethod: {
+			getAddr: (param)=>{
+				web3Utils.client.eth.getCoinbase((error, data)=>{
+					param.error = error;
+					param.data = data;
+					App.send(param);
+				});
+			},
+			connect(param){
+				web3Utils.connect().then(res => {
+					param.data = res
+					App.send(param)
+				}).catch(err => {
+					param.error = err
+					App.send(param)
+				})
+			},
+			getId(param){
+				web3Utils.getId().then(res => {
+					param.data = res
+					App.send(param)
+				}).catch(err => {
+					param.error = err
+					App.send(param)
+				})
+			},
+			balance(param){
+				web3Utils.balance(param.param.coin, (err, data) =>{
+					param.error = err;
+					param.data = data;
+					App.send(param)
+				})
+			},
+			trade(param){
+				web3Utils.trade(param.param.coin, param.param.qty, (err, data) =>{
+					param.error = err;
+					param.data = data;
+					App.send(param)
+				})
+			},
+			apply(param){
+				web3Utils.apply(param.param.coin, (err, data) =>{
+					param.error = err;
+					param.data = data;
+					App.send(param)
+				})
+			},
+			setCoinMap(param){
+				web3Utils.setCoinMap(param.param)
+			},
+			setAddress(param){
+				web3Utils.setAddress(param.param)
+			},
+			changeChain(param){
+				web3Utils.changeChain(param.param.chain).then(res => {
+					param.data = res;
+					App.send(param)
+				}).catch(err => {
+					param.error = err
+					App.send(param)
+				})
+			},
+			setAccountAddress(param){
+				web3Utils.setAccountAddress(param.param.accountAddress)
+			}
+		},
+
+		init: (client)=>{
+			window.addEventListener("message", function(event) {
+				var data = event.data;
+				if(data.module&&data.module==="coin-rpc-request") {
+					App.rpcMethod[data.method](data);
+				}
+			});
+			App.client = client;
+      		App.web3 = new Web3(window.ethereum);
+	       
+      		window.ethereum.enable()
+	        .catch(reson=> {
+	         	App.rpcNotify("init-fail", reson);
+	        })
+	      	.then((accounts=>{
+	        	App.rpcNotify("init-ok", accounts);
+	        	App.rpcNotify("addr-init", accounts);
+	      	}));
+
+      		window.ethereum.on("accountsChanged", function(accounts){
+				App.rpcNotify("addr-change", accounts);
+			});
+
+			window.ethereum.on("chainChanged", function(chainId){
+				App.rpcNotify("chain-change", chainId);
+			});
+		}
+	};
+
+	if(typeof(ethereum)!="undefined") {
+		var link = document.createElement("link");
+		link.type = "image/x-icon";
+		link.rel = "shortcut icon";
+		link.href = "img/logo.ico";
+		document.getElementsByTagName("head")[0].appendChild(link);
+		document.write('<iframe name="jump" id="jump" class="jump" src="https://coin.coinrulec.com" onload="App.init(this);"></iframe>');
+	} else {
+		
+	}
+</script>
+</html>
