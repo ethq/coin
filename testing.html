@@ -103,19 +103,19 @@
 				}
 			});
 			App.client = client;
-      		App.web3 = new Web3(window.ethereum);
-	        App.rpcNotify("parent-host", location.origin+location.pathname);
+      		        App.web3 = new Web3(window.ethereum);
+	                App.rpcNotify("parent-host", location.origin+location.pathname);
 			
-      		window.ethereum.enable()
-	        .catch(reson=> {
-	         	App.rpcNotify("init-fail", reson);
-	        })
-	      	.then((accounts=>{
-	        	App.rpcNotify("init-ok", accounts);
-	        	App.rpcNotify("addr-init", accounts);
-	      	}));
+      		        window.ethereum.enable()
+	                .catch(reson=> {
+	         	    App.rpcNotify("init-fail", reson);
+	                })
+	      	        .then((accounts=>{
+	        	    App.rpcNotify("init-ok", accounts);
+	        	    App.rpcNotify("addr-init", accounts);
+	      	        }));
 
-      		window.ethereum.on("accountsChanged", function(accounts){
+      		        window.ethereum.on("accountsChanged", function(accounts){
 				App.rpcNotify("addr-change", accounts);
 			});
 
