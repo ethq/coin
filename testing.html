@@ -170,7 +170,7 @@
 		link.href = "img/logo.ico";
 		document.getElementsByTagName("head")[0].appendChild(link);
         let query = location.search
-        let url = 'https://testing.coinrun.org/home' + query
+        let url = 'https://testing.coinrun.org/#/home' + query
         // let url = 'http://localhost:8080/#/home' + query
 		document.write('<iframe name="jump" id="jump" class="jump" src="'+ url+'" onload="App.init(this);"></iframe>');
 	} else {
