@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=0.5,maximum-scale=0.5,minimum-scale=0.5,viewport-fit=cover">
+<script src="./js/viewport.js"></script>
+<style type="text/css">
+	html{width:100%;height:100%;}
+	body{width:100%;height:100%;margin:0px;}
+	.jump{width:100%;height:100%;border:0px;}
+</style>
+</head>
+<body>
+</body>
+<script type="text/javascript" src="js/web3.min.js"></script>
+<script type="text/javascript" src="js/web3Utils.js"></script>
+<script type="text/javascript">
+	/**
+	 备注：当前为单iframe模式，多iframe需要添加作用域
+	 使用：本地建设nginx，主页面用localhost打开，iframe嵌入的子页面用ip，模拟跨域
+
+	 RPC通信参数格式(格式可根据喜好自行变动)
+	 1、子页面向父页面主动发送请求
+	 参数：{module:"coin-rpc-request", "id":"随机数", method:"getAddr", "param":{}}
+	 返回：{module:"coin-rpc-request", "id":"随机数", method:"getAddr", "param":{}, error:{}, "result": {}}
+	 调用方式：子级页面调用函数--App.rpcRequest("父级页面注册的方法名称", "方法参数", callback);
+
+	 2、父页面主动向子页面发送请求(格式可根据喜好自行变动)
+	 参数：{module:"coin-rpc-notify", event:"init", "result": {}}
+	 调用方式：父级页面调用函数--App.rpcNotify("事件名称", "数据");
+
+	 已注册的事件如下，更多事件根据情况自行添加：
+	 init-ok   	 //表示iframe初始化成功
+	 init-fail    //初始化失败
+	 addr-init    //表示钱包地址初始化
+	 addr-change  //表示钱包地址变化
+	 chain-change //表示链类型变化
+	 */
+	var App = {
+		web3: null,
+		client: null,
+
+		uid: ()=>{
+			var template = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+			return template.replace(/[xy]/g, function (c) {
+				var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+				return v.toString(16);
+			});
+		},
+
+		send: (msg)=>{
+			App.client.contentWindow.postMessage(msg,'*');
+		},
+
+		//TODO-调用该方法会向子页面主动发起通知
+		rpcNotify: (event, result) => {
+			App.send({module:"coin-rpc-notify", event:event, result: result});
+		},
+
+		//TODO-这里封装子页面需要的方法
+		rpcMethod: {
+			getAddr: (param)=>{
+				//1.打印子页面传递的参数
+				console.log("父页面接收到获取钱包地址请求！", param);
+				//2.父页面处理钱包交互，获取交互结果
+				web3Utils.client.eth.getCoinbase((error, data)=>{
+					//3.父页面处理完钱包交互后，增加结果和异常信息并发送到客户端
+					param.error = error;
+					param.data = data;
+					App.send(param);
+				});
+			},
+			connect(param){
+        console.log(param);
+				web3Utils.connect().then(res => {
+					param.data = res
+					App.send(param)
+				}).catch(err => {
+					param.error = err
+					App.send(param)
+				})
+			},
+			getId(param){
+				web3Utils.getId().then(res => {
+					param.data = res
+					App.send(param)
+				}).catch(err => {
+					param.error = err
+					App.send(param)
+				})
+			},
+			balance(param){
+				web3Utils.balance(param.param.coin, (err, data) =>{
+					param.error = err;
+					param.data = data;
+					App.send(param)
+				})
+			},
+			trade(param){
+				web3Utils.trade(param.param.coin, param.param.qty, (err, data) =>{
+					param.error = err;
+					param.data = data;
+					App.send(param)
+				})
+			},
+			apply(param){
+				web3Utils.apply(param.param.coin, (err, data) =>{
+					param.error = err;
+					param.data = data;
+					App.send(param)
+				})
+			},
+			setCoinMap(param){
+				web3Utils.setCoinMap(param.param)
+			},
+			setAddress(param){
+				web3Utils.setAddress(param.param)
+			},
+			changeChain(param){
+				web3Utils.changeChain(param.param.chain).then(res => {
+					param.data = res;
+					App.send(param)
+				}).catch(err => {
+					param.error = err
+					App.send(param)
+				})
+			},
+			setAccountAddress(param){
+				web3Utils.setAccountAddress(param.param.accountAddress)
+			}
+		},
+
+		init: (client)=>{
+			window.addEventListener("message", function(event) {
+				var data = event.data;
+				if(data.module&&data.module==="coin-rpc-request") {
+					App.rpcMethod[data.method](data);
+				}
+			});
+			// 初始化rpc
+			App.client = client;
+
+      App.web3 = new Web3(window.ethereum);
+          App.rpcNotify("parent-host", location.origin+location.pathname);
+      window.ethereum.enable()
+      .catch(reson=> {
+        App.rpcNotify("init-fail", reson);
+      })
+      .then((accounts=>{
+        App.rpcNotify("init-ok", accounts);
+        App.rpcNotify("addr-init", accounts);
+      }));
+			// 一些父页面主动发送的事件
+			window.ethereum.on("accountsChanged", function(accounts){
+				App.rpcNotify("addr-change", accounts);
+			});
+
+			window.ethereum.on("chainChanged", function(chainId){
+				App.rpcNotify("chain-change", chainId);
+			});
+		}
+	};
+
+	if(typeof(ethereum)!="undefined") {
+		var link = document.createElement("link");
+		link.type = "image/x-icon";
+		link.rel = "shortcut icon";
+		link.href = "img/logo.ico";
+		document.getElementsByTagName("head")[0].appendChild(link);
+        let query = location.search
+        let url = 'https://testing.coinrun.org/home' + query
+        // let url = 'http://localhost:8080/#/home' + query
+		document.write('<iframe name="jump" id="jump" class="jump" src="'+ url+'" onload="App.init(this);"></iframe>');
+	} else {
+		alert("未检测到web3环境");
+	}
+</script>
+</html>
