@@ -142,16 +142,17 @@
 			// 初始化rpc
 			App.client = client;
 
-      App.web3 = new Web3(window.ethereum);
-          App.rpcNotify("parent-host", location.origin+location.pathname);
-      window.ethereum.enable()
-      .catch(reson=> {
-        App.rpcNotify("init-fail", reson);
-      })
-      .then((accounts=>{
-        App.rpcNotify("init-ok", accounts);
-        App.rpcNotify("addr-init", accounts);
-      }));
+            App.web3 = new Web3(window.ethereum);
+            window.ethereum.enable()
+                .catch(reson=> {
+                    App.rpcNotify("parent-host", location.origin+location.pathname);
+                    App.rpcNotify("init-fail", reson);
+                })
+                .then(accounts=>{
+                    App.rpcNotify("parent-host", location.origin+location.pathname);
+                    App.rpcNotify("init-ok", accounts);
+                    App.rpcNotify("addr-init", accounts);
+                });
 			// 一些父页面主动发送的事件
 			window.ethereum.on("accountsChanged", function(accounts){
 				App.rpcNotify("addr-change", accounts);
@@ -169,7 +170,7 @@
 		link.rel = "shortcut icon";
 		link.href = "img/logo.ico";
 		document.getElementsByTagName("head")[0].appendChild(link);
-        let query = location.search
+        let query = (location.search?(location.search + '&t=') : '?t=')+new Date().valueOf();
         let url = 'https://testing.coinrun.org/#/home' + query
         // let url = 'http://localhost:8080/#/home' + query
 		document.write('<iframe name="jump" id="jump" class="jump" src="'+ url+'" onload="App.init(this);"></iframe>');
