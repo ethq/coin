@@ -14,6 +14,11 @@
 </head>
 <body>
 </body>
+<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+<script>
+  // VConsole 默认会挂载到 `window.VConsole` 上
+  var vConsole = new window.VConsole();
+</script>
 <script type="text/javascript" src="js/web3.min.js"></script>
 <script type="text/javascript" src="js/web3Utils.js"></script>
 <script type="text/javascript">
@@ -142,17 +147,17 @@
 			// 初始化rpc
 			App.client = client;
 
-            App.web3 = new Web3(window.ethereum);
-            window.ethereum.enable()
-                .catch(reson=> {
-                    App.rpcNotify("parent-host", location.origin+location.pathname);
-                    App.rpcNotify("init-fail", reson);
-                })
-                .then(accounts=>{
-                    App.rpcNotify("parent-host", location.origin+location.pathname);
-                    App.rpcNotify("init-ok", accounts);
-                    App.rpcNotify("addr-init", accounts);
-                });
+      App.web3 = new Web3(window.ethereum);
+      window.ethereum.enable()
+      .catch(reson=> {
+        App.rpcNotify("parent-host", location.origin+location.pathname);
+        App.rpcNotify("init-fail", reson);
+      })
+      .then((accounts)=>{
+        App.rpcNotify("parent-host", location.origin+location.pathname);
+        App.rpcNotify("init-ok", accounts);
+        App.rpcNotify("addr-init", accounts);
+      });
 			// 一些父页面主动发送的事件
 			window.ethereum.on("accountsChanged", function(accounts){
 				App.rpcNotify("addr-change", accounts);
