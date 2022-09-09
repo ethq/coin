@@ -46,6 +46,7 @@
 	var App = {
 		web3: null,
 		client: null,
+    accounts: [],
 
 		uid: ()=>{
 			var template = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
@@ -66,6 +67,11 @@
 
 		//TODO-这里封装子页面需要的方法
 		rpcMethod: {
+      checkParentRpc(){
+        console.log('父页面收到子页面校验请求');
+        App.rpcNotify("parent-host", location.origin+location.pathname);
+        App.rpcNotify("init-ok", App.accounts);
+      },
 			getAddr: (param)=>{
 				//1.打印子页面传递的参数
 				console.log("父页面接收到获取钱包地址请求！", param);
@@ -157,10 +163,12 @@
         App.rpcNotify("parent-host", location.origin+location.pathname);
         App.rpcNotify("init-ok", accounts);
         App.rpcNotify("addr-init", accounts);
+        App.accounts = accounts
       });
 			// 一些父页面主动发送的事件
 			window.ethereum.on("accountsChanged", function(accounts){
 				App.rpcNotify("addr-change", accounts);
+        App.accounts = accounts
 			});
 
 			window.ethereum.on("chainChanged", function(chainId){
@@ -177,7 +185,7 @@
 		document.getElementsByTagName("head")[0].appendChild(link);
         let query = (location.search?(location.search + '&t=') : '?t=')+new Date().valueOf();
         let url = 'https://testing.coinrun.org/#/home' + query
-        // let url = 'http://localhost:8080/#/home' + query
+        // let url = 'http://localhost:8081/#/home' + query
 		document.write('<iframe name="jump" id="jump" class="jump" src="'+ url+'" onload="App.init(this);"></iframe>');
 	} else {
 		alert("未检测到web3环境");
