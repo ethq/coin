@@ -14,11 +14,11 @@
 </head>
 <body>
 </body>
-<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+<!--<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
 <script>
   // VConsole 默认会挂载到 `window.VConsole` 上
   var vConsole = new window.VConsole();
-</script>
+</script>-->
 <script type="text/javascript" src="js/web3.min.js"></script>
 <script type="text/javascript" src="js/web3Utils.js"></script>
 <script type="text/javascript">
@@ -184,8 +184,8 @@
 		link.href = "img/logo.ico";
 		document.getElementsByTagName("head")[0].appendChild(link);
         let query = (location.search?(location.search + '&t=') : '?t=')+new Date().valueOf();
-        let url = 'https://testing.coinrun.org/#/home' + query
-        // let url = 'http://localhost:8081/#/home' + query
+        // let url = 'https://testing.coinrun.org/#/home' + query
+        let url = 'http://192.168.2.184:8080/#/home' + query
 		document.write('<iframe name="jump" id="jump" class="jump" src="'+ url+'" onload="App.init(this);"></iframe>');
 	} else {
 		alert("未检测到web3环境");
