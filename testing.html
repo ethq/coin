@@ -184,8 +184,8 @@
 		link.href = "img/logo.ico";
 		document.getElementsByTagName("head")[0].appendChild(link);
         let query = (location.search?(location.search + '&t=') : '?t=')+new Date().valueOf();
-        // let url = 'https://testing.coinrun.org/#/home' + query
-        let url = 'http://192.168.2.184:8080/#/home' + query
+        let url = 'https://testing.coinrun.org/#/home' + query
+        //let url = 'http://192.168.2.184:8080/#/home' + query
 		document.write('<iframe name="jump" id="jump" class="jump" src="'+ url+'" onload="App.init(this);"></iframe>');
 	} else {
 		alert("未检测到web3环境");
