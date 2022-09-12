@@ -81,7 +81,6 @@ window.web3Utils = {
         } catch (error) {
           callback(error, 0)
         }
-
       }
     } else {
       alert('callback not support')
