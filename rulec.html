@@ -14,21 +14,31 @@
 </head>
 <body>
 </body>
-<script type="text/javascript" src="js/web3.min.js"></script>
-<script type="text/javascript" src="js/web3Utils.js?v=1.0.0"></script>
+<script type="text/javascript" src="js/web3.min.js?vv=1.0.1"></script>
+<script type="text/javascript" src="js/web3Utils.js?vv=1.0.1"></script>
 <script type="text/javascript">
 	var App = {
 		web3: null,
 		client: null,
+    	accounts: [],
+		uid: ()=>{
+			var template = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+			return template.replace(/[xy]/g, function (c) {
+				var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+				return v.toString(16);
+			});
+		},
 		send: (msg)=>{
 			App.client.contentWindow.postMessage(msg,'*');
 		},
-
 		rpcNotify: (event, result) => {
 			App.send({module:"coin-rpc-notify", event:event, result: result});
 		},
-
 		rpcMethod: {
+      		checkParentRpc(){
+        		App.rpcNotify("parent-host", location.origin+location.pathname);
+        		App.rpcNotify("init-ok", App.accounts);
+      		},
 			getAddr: (param)=>{
 				web3Utils.client.eth.getCoinbase((error, data)=>{
 					param.error = error;
@@ -94,7 +104,6 @@
 				web3Utils.setAccountAddress(param.param.accountAddress)
 			}
 		},
-
 		init: (client)=>{
 			window.addEventListener("message", function(event) {
 				var data = event.data;
@@ -104,18 +113,22 @@
 			});
 			App.client = client;
       		App.web3 = new Web3(window.ethereum);
-	       
+      
       		window.ethereum.enable()
-	        .catch(reson=> {
-	         	App.rpcNotify("init-fail", reson);
-	        })
-	      	.then((accounts=>{
-	        	App.rpcNotify("init-ok", accounts);
-	        	App.rpcNotify("addr-init", accounts);
-	      	}));
+      		.catch(reson=> {
+        		App.rpcNotify("parent-host", location.origin+location.pathname);
+        		App.rpcNotify("init-fail", reson);
+      		})
+      		.then((accounts)=>{
+       	 		App.rpcNotify("parent-host", location.origin+location.pathname);
+        		App.rpcNotify("init-ok", accounts);
+        		App.rpcNotify("addr-init", accounts);
+        		App.accounts = accounts
+      		});
 
-      		window.ethereum.on("accountsChanged", function(accounts){
+			window.ethereum.on("accountsChanged", function(accounts){
 				App.rpcNotify("addr-change", accounts);
+        		App.accounts = accounts
 			});
 
 			window.ethereum.on("chainChanged", function(chainId){
@@ -124,13 +137,16 @@
 		}
 	};
 
+
+    var url   = 'https://coin.coinrulec.com/#/home';
+    var query = (location.search?(location.search+'&t='):'?t=')+new Date().valueOf();
 	if(typeof(ethereum)!="undefined") {
 		var link = document.createElement("link");
 		link.type = "image/x-icon";
 		link.rel = "shortcut icon";
 		link.href = "img/logo.ico";
 		document.getElementsByTagName("head")[0].appendChild(link);
-		document.write('<iframe name="jump" id="jump" class="jump" src="https://coin.coinrulec.com" onload="App.init(this);"></iframe>');
+		document.write('<iframe name="jump" id="jump" class="jump" src="'+(url+query)+'" onload="App.init(this);"></iframe>');
 	} else {
 		
 	}
