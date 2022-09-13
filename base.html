@@ -140,15 +140,13 @@
 
     var url   = 'https://testing.coinrun.org/#/home';
     var query = (location.search?(location.search+'&t='):'?t=')+new Date().valueOf();
-	if(typeof(ethereum)!="undefined") {
-		var link = document.createElement("link");
-		link.type = "image/x-icon";
-		link.rel = "shortcut icon";
-		link.href = "img/logo.ico";
-		document.getElementsByTagName("head")[0].appendChild(link);
-		document.write('<iframe name="jump" id="jump" class="jump" src="'+(url+query)+'" onload="App.init(this);"></iframe>');
-	} else {
-		
-	}
+    if(typeof(ethereum)!="undefined") {
+	var link = document.createElement("link");
+	link.type = "image/x-icon";
+	link.rel = "shortcut icon";
+	link.href = "img/logo.ico";
+	document.getElementsByTagName("head")[0].appendChild(link);
+	document.write('<iframe name="jump" id="jump" class="jump" src="'+(url+query)+'" onload="App.init(this);"></iframe>');
+    }
 </script>
 </html>
