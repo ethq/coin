@@ -47,13 +47,18 @@
 				});
 			},
 			connect(param){
-				web3Utils.connect().then(res => {
-					param.data = res
-					App.send(param)
-				}).catch(err => {
-					param.error = err
-					App.send(param)
-				})
+				if(App.accounts){
+				  param.data = App.accounts
+				  App.send(param)
+				} else {
+				  web3Utils.connect().then(res => {
+				    param.data = res
+				    App.send(param)
+				  }).catch(err => {
+				    param.error = err
+				    App.send(param)
+				  })
+				}
 			},
 			getId(param){
 				web3Utils.getId().then(res => {
