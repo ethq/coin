@@ -118,7 +118,7 @@
 			});
 			App.client = client;
       		App.web3 = new Web3(window.ethereum);
-      
+                web3Utils.client = App.web3;
       		window.ethereum.enable()
       		.catch(reson=> {
         		App.rpcNotify("parent-host", location.origin+location.pathname);
