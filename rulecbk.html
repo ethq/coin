@@ -138,6 +138,7 @@
 
 			window.ethereum.on("chainChanged", function(chainId){
 				App.rpcNotify("chain-change", chainId);
+				window.location.reload();
 			});
 		}
 	};
