@@ -55,12 +55,12 @@ window.web3Utils = {
     if (!info) throw 'Unsupported currency: ' + coin
     if (info.holder == null) {
       console.log(new Web3(window.ethereum).eth.getGasPrice());
-      const gasPrice = await new Web3(window.ethereum).eth.getGasPrice()
+      //const gasPrice = await this.client.eth.getGasPrice()
       info.holder = new this.client.eth.Contract(
         info.contractAbi,
         info.contractAddress, {
           gas: 200000,
-          gasPrice: gasPrice
+          gasPrice: 8032466577
         })
     }
     return info.holder
