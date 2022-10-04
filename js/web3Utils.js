@@ -10,7 +10,7 @@ window.web3Utils = {
     return window.ethereum.enable()
   },
   getClient: function(){
-    return this.client;
+    return App.web3;
   },
   getId: function(){
     if (this.client == null) throw 'Please reconnect wallet'
