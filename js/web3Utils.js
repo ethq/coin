@@ -54,8 +54,13 @@ window.web3Utils = {
     var info = this.coinMap[coin]
     if (!info) throw 'Unsupported currency: ' + coin
     if (info.holder == null) {
-      info.holder = new this.client.eth.Contract(info.contractAbi,
-        info.contractAddress, {})
+      const gasPrice = await this.client.eth.getGasPrice()
+      info.holder = new this.client.eth.Contract(
+        info.contractAbi,
+        info.contractAddress, {
+          gas: 200000,
+          gasPrice: gasPrice
+        })
     }
     return info.holder
   },
