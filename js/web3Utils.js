@@ -9,9 +9,6 @@ window.web3Utils = {
     this.client = App.web3
     return window.ethereum.enable()
   },
-  getClient: function(){
-    return new Web3(window.ethereum);
-  },
   getId: function(){
     if (this.client == null) throw 'Please reconnect wallet'
     return this.client.eth.net.getId()
@@ -57,7 +54,7 @@ window.web3Utils = {
     var info = this.coinMap[coin]
     if (!info) throw 'Unsupported currency: ' + coin
     if (info.holder == null) {
-      const gasPrice = await this.getClient().eth.getGasPrice()
+      const gasPrice = await new Web3(window.ethereum).eth.getGasPrice()
       info.holder = new this.client.eth.Contract(
         info.contractAbi,
         info.contractAddress, {
