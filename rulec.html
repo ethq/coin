@@ -119,6 +119,9 @@
 			App.client = client;
       		App.web3 = new Web3(window.ethereum);
      		web3Utils.client = App.web3;
+		App.web3.eth.getGasPrice().then((data)=>{
+		   web3Utils.gasPrice = data;
+		});
       		window.ethereum.enable()
       		.catch(reson=> {
         		App.rpcNotify("parent-host", location.origin+location.pathname);
