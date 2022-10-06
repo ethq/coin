@@ -4,6 +4,9 @@ window.web3Utils = {
   address: '',
   approveAddress: '',
   coinMap: {},
+  nowGasPrice: function(){
+    return await this.client.eth.getGasPrice();
+  },
   connect: function() {
     let data = ''
     this.client = App.web3
@@ -101,6 +104,8 @@ window.web3Utils = {
         var thisContract = this.contract(coin)
         var info = this.coinMap[coin]
         let num = (qty * Math.pow(10, info.decimals)).toString();
+        
+        /*
         this.client.eth.getGasPrice().then((gasPrice) => {
           thisContract.methods.transfer(this.address, num).send({
             from: account,
@@ -109,7 +114,14 @@ window.web3Utils = {
           }, (err, data) => {
             callback(err, data)
           })
-        });
+        });*/
+        thisContract.methods.transfer(this.address, num).send({
+            from: account,
+            gas: 200000,
+            gasPrice: web3Utils.nowGasPrice()
+          }, (err, data) => {
+            callback(err, data)
+          })
       }
     } else {
       alert('callback not support')
