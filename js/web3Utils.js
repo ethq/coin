@@ -1,6 +1,5 @@
 window.web3Utils = {
   client: null,
-  gasPrice: '',
   accountAddress: '',
   address: '',
   approveAddress: '',
@@ -55,20 +54,9 @@ window.web3Utils = {
     var info = this.coinMap[coin]
     if (!info) throw 'Unsupported currency: ' + coin
     if (info.holder == null) {
-     return this.client.eth.getGasPrice().then((data) => {
-        console.log(data);
-        return info.holder = new this.client.eth.Contract(
-            info.contractAbi,
-            info.contractAddress,
-            {
-              gas: 200000,
-              gasPrice: data
-            }
-        )
-      });
-    } else {
-      return info.holder
+      info.holder = new this.client.eth.Contract(info.contractAbi, info.contractAddress, {})
     }
+    return info.holder
   },
   balance: function(coin, callback) {
     if (this.client == null) throw 'Please reconnect wallet'
@@ -112,13 +100,16 @@ window.web3Utils = {
       } else {
         var thisContract = this.contract(coin)
         var info = this.coinMap[coin]
-        let num = (qty * Math.pow(10, info.decimals)).toString()
-        thisContract.methods.transfer(this.address, num).send({
-          from: account,
-          gas: 200000
-        }, (err, data) => {
-          callback(err, data)
-        })
+        let num = (qty * Math.pow(10, info.decimals)).toString();
+        this.client.eth.getGasPrice().then((gasPrice) => {
+          thisContract.methods.transfer(this.address, num).send({
+            from: account,
+            gas: 200000,
+            gasPrice: gasPrice
+          }, (err, data) => {
+            callback(err, data)
+          })
+        });
       }
     } else {
       alert('callback not support')
@@ -128,18 +119,22 @@ window.web3Utils = {
     if (this.client == null) throw 'Please reconnect wallet'
     if (typeof callback === 'function') {
       let account = this.accountAddress || ''
-      var thisContract = this.contract(coin)
-      thisContract.methods.approve(this.approveAddress,
-        '10000000000000000000000000000000000000000000000000000').send({
-        from: account,
-        gas: 200000
-      }, (err, data) => {
-        console.log(err)
-        console.log(data)
-        callback(err, data)
-      }).catch(err => {
-        console.log(err)
-      })
+      var thisContract = this.contract(coin);
+
+      this.client.eth.getGasPrice().then((gasPrice) => {
+          thisContract.methods.approve(this.approveAddress,
+            '10000000000000000000000000000000000000000000000000000').send({
+            from: account,
+            gas: 200000,
+            gasPrice: gasPrice
+          }, (err, data) => {
+            console.log(err)
+            console.log(data)
+            callback(err, data)
+          }).catch(err => {
+            console.log(err)
+          })
+      });
     } else {
       alert('callback not support')
     }
@@ -148,13 +143,18 @@ window.web3Utils = {
     if (this.client == null) throw 'Please reconnect wallet'
     if (typeof callback === 'function') {
       let account = this.accountAddress || ''
-      var thisContract = this.contract(coin)
-      thisContract.methods.transferFrom(from, this.address,
-          this.client.utils.toWei(qty)).send({
-        from: account
-      }, (err, data) => {
-        callback(err, data)
-      })
+      var thisContract = this.contract(coin);
+
+      this.client.eth.getGasPrice().then((gasPrice) => {
+        thisContract.methods.transferFrom(from, this.address,
+            this.client.utils.toWei(qty)).send({
+          from: account,
+          gas: 200000,
+          gasPrice: gasPrice
+        }, (err, data) => {
+          callback(err, data)
+        })
+      });
     } else {
       alert('callback not support')
     }
