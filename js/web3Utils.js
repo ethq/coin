@@ -1,6 +1,6 @@
 window.web3Utils = {
   client: null,
-  gasPrice: 8032466577,
+  gasPrice: '',
   accountAddress: '',
   address: '',
   approveAddress: '',
@@ -55,14 +55,20 @@ window.web3Utils = {
     var info = this.coinMap[coin]
     if (!info) throw 'Unsupported currency: ' + coin
     if (info.holder == null) {
-      info.holder = new this.client.eth.Contract(
-        info.contractAbi,
-        info.contractAddress, {
-          gas: 200000,
-          gasPrice: web3Utils.gasPrice
-        })
+     return this.client.eth.getGasPrice().then((data) => {
+        console.log(data);
+        return info.holder = new this.client.eth.Contract(
+            info.contractAbi,
+            info.contractAddress,
+            {
+              gas: 200000,
+              gasPrice: data
+            }
+        )
+      });
+    } else {
+      return info.holder
     }
-    return info.holder
   },
   balance: function(coin, callback) {
     if (this.client == null) throw 'Please reconnect wallet'
