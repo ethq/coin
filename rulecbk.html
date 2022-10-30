@@ -7,13 +7,66 @@
 <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=0.5,maximum-scale=0.5,minimum-scale=0.5,viewport-fit=cover">
 <script src="./js/viewport.js"></script>
 <style type="text/css">
-	html{width:100%;height:100%;}
-	body{width:100%;height:100%;margin:0px;}
-	.jump{width:100%;height:100%;border:0px;}
+    html{width:100%;height:100%;}
+    body{width:100%;height:100%;margin:0px; background: rgba(0,0,0,0.2);}
+    .jump{width:100%;height:100%;border:0px;}
+</style>
+<style>
+.popup-detail{
+  display:none;
+  width: 440px;
+  height: 232px;
+  background-image: url("./img/popbg.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  position: absolute;
+  left: calc(50vw - 220px);
+  top: calc(50vh - 116px);
+  background-color: #fff;
+  overflow: hidden;
+  border-radius: 16px;
+}
+.popup-detail .tips{
+width: 320px;
+font-size: 32px;
+font-family: PingFang SC-中黑体, PingFang SC;
+font-weight: normal;
+color: #111E2F;
+line-height: 40px;
+margin: 40px auto 20px;
+text-align: center;
+}
+.popup-detail .btn{
+width: 240px;
+height: 64px;
+background: #F7B500;
+border-radius: 8px 8px 8px 8px;
+line-height: 64px;
+text-align: center;
+font-size: 30px;
+font-family: PingFang SC-中黑体, PingFang SC;
+font-weight: normal;
+color: #111E2F;
+margin: 0 auto;
+}
 </style>
 </head>
 <body>
+<div class="popup-detail" id="noWeb3">
+    <div class="tips">Please open it inside the wallet</div>
+    <div class="btn" onclick="window.close()">ok</div>
+</div>
 </body>
+<script>
+  var close = function(){
+    let dom = document.getElementById("noWeb3")
+    dom.style.display = "none"
+  }
+  var open = function(){
+    let dom = document.getElementById("noWeb3")
+    dom.style.display = "block"
+  }
+</script>
 <script type="text/javascript" src="js/web3.min.js?vv=1.0.1"></script>
 <script type="text/javascript" src="js/web3Utils.min.js?vv=1.0.1"></script>
 <script type="text/javascript">
@@ -119,7 +172,7 @@
 			App.client = client;
       		App.web3 = new Web3(window.ethereum);
                 web3Utils.client = App.web3;
-		
+
       		window.ethereum.enable()
       		.catch(reson=> {
         		App.rpcNotify("parent-host", location.origin+location.pathname);
@@ -155,7 +208,7 @@
 		document.getElementsByTagName("head")[0].appendChild(link);
 		document.write('<iframe name="jump" id="jump" class="jump" src="'+(url+query)+'" onload="App.init(this);"></iframe>');
 	} else {
-
+        open()
 	}
 </script>
 </html>
