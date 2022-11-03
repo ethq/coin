@@ -53,8 +53,8 @@
 </head>
 <body>
 <div class="popup-detail" id="noWeb3">
-    <div class="tips">Please open it inside the wallet</div>
-    <div class="btn" onclick="window.close()">ok</div>
+    <div class="tips">Please openTip it inside the wallet</div>
+    <div class="btn" onclick="window.closeTip()">ok</div>
 </div>
 </body>
 <!--<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
@@ -63,11 +63,11 @@
   var vConsole = new window.VConsole();
 </script>-->
 <script>
-    var close = function(){
+    var closeTip = function(){
       let dom = document.getElementById("noWeb3")
       dom.style.display = "none"
     }
-    var open = function(){
+    var openTip = function(){
       let dom = document.getElementById("noWeb3")
       dom.style.display = "block"
     }
@@ -248,7 +248,7 @@
 		document.write('<iframe name="jump" id="jump" class="jump" src="'+ url+'" onload="App.init(this);"></iframe>');
 	} else {
 		// alert("未检测到web3环境");
-        open()
+        openTip()
 	}
 </script>
 </html>
